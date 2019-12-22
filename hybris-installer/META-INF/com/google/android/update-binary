@@ -61,8 +61,13 @@ invalid_device && CURRENT_DEVICE=`getprop ro.build.product`
 mount | grep -q "/data.*ext4" || abort 3 "Data is NOT formatted as ext4; check out 'Wipe > Advanced' from TWRP!"
 
 # Treble
-[ -r /dev/block/bootdevice/by-name/vendor ] || abort 4 "A vendor partition doesn't exist; you need to do an OTA from OxygenOS 5.1.5 to 5.1.6!"
-
+if [ -d /system_root ] && [ "$(ls -A /system_root)" -eq 1 ] ; then # If /system_root exists and is empty
+	log "Device is system-as-root but /system_root is mounted to /system, fixing"
+	umount /system
+	mount /dev/block/bootdevice/by-name/system /system_root || abort 99 "Failed to mount system to /system_root"
+	mount -o bind /system_root /system || abort 98 "Failed to bind mount /system_root/system to /system"
+	log "Successfully fixed /system mountpoint, toybox should work properly now..."
+fi
 # Android
 (mount | grep -q /system || mount /system) || abort 5 "Couldn't mount /system!"
 if [ `cat /system/build.prop | grep lineage.build.version= | cut -d'=' -f2` != "$TARGET_LOS_VER" ]; then
@@ -138,6 +143,13 @@ rm -rf $ROOT/
 mkdir -p $ROOT/
 /system/bin/toybox tar -xj -f $ARCHIVE -C $ROOT/ || abort 10 "Couldn't extract SFOS rootfs!"
 rm $ARCHIVE
+
+log "Cloning /persist from Android to prevent issues with WiFi when dual booting"
+mkdir /persist
+mount /dev/block/bootdevice/by-name/persist /persist
+cp -r /persist/* $ROOT/mnt/vendor/persist/
+log "Disabling /mnt/vendor/persist mount point"
+ln -s /dev/null $ROOT/etc/systemd/system/mnt-vendor-persist.mount
 
 log "Fixing up init scripts..."
 sed -e "/extraenv/s/^/#/g" -e "/import \/init.\${ro.hardware}.rc/s/^/#/" -e "/ro.zygote/s/^/#/g" -e "/start update_verifier/s/^/#/g" \
