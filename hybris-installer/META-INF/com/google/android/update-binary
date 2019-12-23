@@ -61,12 +61,12 @@ invalid_device && CURRENT_DEVICE=`getprop ro.build.product`
 mount | grep -q "/data.*ext4" || abort 3 "Data is NOT formatted as ext4; check out 'Wipe > Advanced' from TWRP!"
 
 # Treble
-if [ -d /system_root ]; then # If /system_root exists and is empty
+if [ $TARGET_DEVICE == "enchilada" ]; then # If /system_root exists and is empty
 	log "Device is system-as-root, ensuring /system_root and /system are mounted correctly"
 	umount /system
 	umount /system_root
 	mount /dev/block/bootdevice/by-name/system /system_root || abort 99 "Failed to mount system to /system_root"
-	mount -o bind /system_root /system || abort 98 "Failed to bind mount /system_root/system to /system"
+	mount -o bind /system_root/system /system || abort 98 "Failed to bind mount /system_root/system to /system"
 	log "Successfully fixed /system mountpoint, toybox should work properly now..."
 fi
 # Android
@@ -152,8 +152,8 @@ mkdir -p /data/.stowaways/sailfishos/mnt/vendor/persist
 cp -r /persist/* $ROOT/mnt/vendor/persist/
 log "Disabling /mnt/vendor/persist mount point"
 ln -s /dev/null $ROOT/etc/systemd/system/mnt-vendor-persist.mount
-log "making wlan_mac.bin read only. To stop android services from clearing it"
-chmod 044 /data/.stowaways/sailfishos/mnt/vendor/persist/wlan_mac.bin
+log "Deleting wlan_mac.bin to ensure MAC gets loaded from firmware"
+rm /data/.stowaways/sailfishos/mnt/vendor/persist/wlan_mac.bin
 
 log "Fixing up init scripts..."
 sed -e "/extraenv/s/^/#/g" -e "/import \/init.\${ro.hardware}.rc/s/^/#/" -e "/ro.zygote/s/^/#/g" -e "/start update_verifier/s/^/#/g" \
