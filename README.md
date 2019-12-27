@@ -14,7 +14,7 @@ Feel free to fork and adapt (see guide below the screenshot) to your device's ne
 To get a quick start you can simply execute the following in your PLATFORM_SDK environment:
 ```
 cd $ANDROID_ROOT/
-git clone https://github.com/sailfishos-oneplus5/hybris-installer hybris/hybris-installer/
+git clone https://github.com/sailfish-oneplus6/hybris-installer hybris/hybris-installer/
 mkdir hybris/droid-configs/kickstart/
 curl -L https://git.io/Je2JI -o hybris/droid-configs/kickstart/pack_package-droid-updater
 ```
