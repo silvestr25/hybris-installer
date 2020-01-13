@@ -12,7 +12,7 @@
 
 OUTFD="/proc/self/fd/$2" # e.g. "/proc/self/fd/28"
 ZIPFILE="$3"             # e.g. "/sdcard/%DST_PKG%.zip"
-FILES="/tmp/hybris-installer"
+export FILES="/tmp/hybris-installer"
 
 # Set progress bar percentage using a fraction ($1) in range 0.00 - 1.00
 set_progress() { echo -e "set_progress $1\n" > $OUTFD; }
@@ -43,7 +43,7 @@ VERSION="%VERSION%" # e.g. "3.2.0.12 (Torronsuo)"
 TARGET_LOS_VER="%LOS_VER%" # e.g. "16.0"
 TARGET_DEVICE="%DEVICE%" # e.g. "cheeseburger"
 CURRENT_DEVICE=`getprop ro.omni.device`
-ROOT="/data/.stowaways/sailfishos"
+export ROOT="/data/.stowaways/sailfishos"
 FORCE_REINSTALL=0
 
 # >>> Sanity checks >>>
@@ -175,6 +175,9 @@ fi
 
 log "Writing hybris-boot image..."
 dd if=$ROOT/boot/hybris-boot.img of=/dev/block/bootdevice/by-name/boot_a || abort 11 "Couldn't write Hybris boot image!"
+
+log "Applying patches"
+sh $FILES/patches/apply-patches.sh
 
 # <<< Script <<<
 

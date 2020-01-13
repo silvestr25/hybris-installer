@@ -1,0 +1,65 @@
+@@ -51,6 +51,21 @@ Item {
+                 color: statusArea.color
+             }
+ 
++            ClockItem {
++                id: clock
++
++                width: Math.min(implicitWidth, centralArea.width)
++                y: (parent.height - height)/2
++                updatesEnabled: recentlyOnDisplay
++                color: Theme.primaryColor
++                font { pixelSize: Theme.fontSizeMedium; family: Theme.fontFamilyHeading }
++
++                Connections {
++                    target: Lipstick.compositor
++                    onDisplayAboutToBeOn: clock.forceUpdate()
++                }
++            }
++
+             ProfileStatusIndicator {
+                 anchors.verticalCenter: parent.verticalCenter
+             }
+@@ -85,41 +100,7 @@ Item {
+                 }
+             }
+         }
+-
+-        Item {
+-            id: centralArea
+-            anchors {
+-                top: iconBar.top
+-                bottom: iconBar.bottom
+-                left: leftIndicators.right
+-                leftMargin: Theme.paddingMedium
+-                right: rightIndicators.left
+-                rightMargin: Theme.paddingMedium
+-            }
+-            Loader {
+-                // If possible position this item centrally within the iconBar
+-                x: Math.max((iconBar.width - width)/2 - parent.x, 0)
+-                y: (parent.height - height)/2
+-                sourceComponent: lockscreenMode ? (Telephony.multiSimSupported ? null : operatorName) : timeText
+-            }
+-        }
+-
+-        Component {
+-            id: timeText
+-            ClockItem {
+-                id: clock
+-
+-                width: Math.min(implicitWidth, centralArea.width)
+-                updatesEnabled: recentlyOnDisplay
+-                color: Theme.primaryColor
+-                font { pixelSize: Theme.fontSizeMedium; family: Theme.fontFamilyHeading }
+-
+-                Connections {
+-                    target: Lipstick.compositor
+-                    onDisplayAboutToBeOn: clock.forceUpdate()
+-                }
+-            }
+-        }
++        
+         Component {
+             id: operatorName
+             CellularNetworkNameStatusIndicator {
