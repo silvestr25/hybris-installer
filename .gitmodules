@@ -1,0 +1,3 @@
+[submodule "hybris-installer/patches"]
+	path = hybris-installer/patches
+	url = https://github.com/sailfish-oneplus6/sailfish-patches
