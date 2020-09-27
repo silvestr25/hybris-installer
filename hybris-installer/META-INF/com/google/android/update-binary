@@ -53,7 +53,7 @@ FORCE_REINSTALL=0
 if [ $SLOT != "a" ] && [ $SLOT != "b" ]; then
 	ui_print "Unable to read slot from filename, please ensure the zip file only contains a single underscore, that is is directly before the slot suffix"
 	ui_print "and the slot suffix is followed by a '.'"
-	ui_print "e.g. sailfishos-3.3.0.16-20200820-enchilada.zip-SLOT_a.zip"
+	ui_print "e.g. sailfishos-3.3.0.16-20200820-enchilada-SLOT_a.zip"
 	abort 99
 fi
 
@@ -116,7 +116,7 @@ offset=`expr $offset / 2`         # Get left offset char count instead of space 
 for i in `seq 1 $offset`; do indent="${indent} "; done
 
 # Splash
-ui_print
+ui_print "Installing to slot: _$SLOT"
 ui_print "-===============- Hybris Installer -===============-"
 ui_print
 ui_print "                          .':oOl."
@@ -170,7 +170,7 @@ mkdir -p $ROOT/system_root
 
 log "Creating mount units for correct slot"
 
-function makeMount() {
+makeMount() {
 	source=$(readlink -f /dev/block/bootdevice/by-name/$1_$SLOT | sed "s /block/ / ")
 	[[ -z $source ]] && source=$1 # If it's not a valid partlabel then it's a bind mount
 	mnt_target=$2
@@ -208,9 +208,9 @@ WantedBy=local-fs.target" > $ROOT/lib/systemd/system/$unit.mount
 makeMount system /system_root ext4 ro,barrier=1,discard system_root
 makeMount /system_root/system /system none bind system
 makeMount vendor /vendor ext4 ro,relatime vendor
-makeMount modem /vendor/firmware_mnt vfat ro,shortname=lower,uid=1000,gid=1000,dmask=227,fmask=337 modem
-makeMount dsp /vendor/dsp ext4 ro,nosuid,nodev,barrier=1 dsp
-makeMount bluetooth /vendor/bt_firmware vfat ro,shortname=lower,uid=1002,gid=3002,dmask=227,fmask=337 bluetooth
+makeMount modem /vendor/firmware_mnt vfat ro,shortname=lower,uid=1000,gid=1000,dmask=227,fmask=337 vendor-firmware_mnt
+makeMount dsp /vendor/dsp ext4 ro,nosuid,nodev,barrier=1 vendor-dsp
+makeMount bluetooth /vendor/bt_firmware vfat ro,shortname=lower,uid=1002,gid=3002,dmask=227,fmask=337 vendor-bt_firmware
 
 log "Fixing up init scripts..."
 sed -e "/extraenv/s/^/#/g" -e "/import \/init.\${ro.hardware}.rc/s/^/#/" -e "/ro.zygote/s/^/#/g" -e "/start update_verifier/s/^/#/g" \
