@@ -53,7 +53,7 @@ FORCE_REINSTALL=0
 if [ $SLOT != "a" ] && [ $SLOT != "b" ]; then
 	ui_print "Unable to read slot from filename, please ensure the zip file only contains a single underscore, that is is directly before the slot suffix"
 	ui_print "and the slot suffix is followed by a '.'"
-	ui_print "e.g. sailfishos-3.3.0.16-20200820-enchilada-SLOT_a.zip"
+	ui_print "e.g. sailfishos-3.3.0.16-20200820-guacamole-SLOT_a.zip"
 	abort 99
 fi
 
